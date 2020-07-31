@@ -1,0 +1,15 @@
+.container {
+  background-color: #bbada0;
+  padding: 2px;
+  width: 280px;
+  height: 280px;
+  margin: auto;
+  margin-top: 2rem;
+  border-radius: 5px;
+}
+.row {
+  display: flex;
+}
+.col {
+  flex: 1;
+}
