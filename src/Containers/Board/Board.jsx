@@ -14,6 +14,7 @@ export default class Board extends Component {
       ["", "", "", ""],
       ["", "", "", 16],
     ],
+    number: 2,
   };
 
   initBoard() {
@@ -32,25 +33,44 @@ export default class Board extends Component {
     return board;
   }
   addNumberBoBoard(board) {
+    if (this.gameOver(board)) {
+      alert("game over");
+      return;
+    }
     let empty = [];
     for (let row_i in board) {
       for (let col_i in board[row_i]) {
         if (board[row_i][col_i] === "") {
-          console.log(row_i, col_i, "empty");
           empty.push(row_i + "-" + col_i);
         }
       }
     }
-    let selected = empty.length 
-    console.log(empty);
+    let selected = Math.round(Math.random() * empty.length - 1);
+    if (selected < 0) selected = 0;
+    let row_i = empty[selected].split("-")[0];
+    let col_i = empty[selected].split("-")[1];
+    this.insertNumber(board, this.state.number, row_i, col_i);
+    this.setState({
+      board,
+    });
+  }
+
+  gameOver(board) {
+    let gameover = true;
+    for (let row_i in board) {
+      for (let col_i in board[row_i]) {
+        if (board[row_i][col_i] !== "") {
+          gameover = false;
+        }
+      }
+    }
+    return gameover;
   }
 
   componentDidMount() {
     window.addEventListener("keypress", (e) => {
       this.onKeyDownHandler(e);
     });
-
-    this.addNumberBoBoard(this.state.board);
   }
   componentWillUnmount() {
     window.removeEventListener("keypress", (e) => {});
@@ -137,7 +157,9 @@ export default class Board extends Component {
         board = this.moveDown(board, col_1);
       }
     }
+
     this.setState({ board });
+    this.addNumberBoBoard(this.state.board);
   }
   moveRowRight = (row, dir) => {
     for (let loop in row) {
