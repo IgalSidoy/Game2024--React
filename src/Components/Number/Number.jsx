@@ -6,9 +6,12 @@ export default (props) => {
   style.color = props.color;
   style.fontSize = props.fontSize;
 
+  let textStyle = {};
+
+  textStyle.paddingTop = props.paddingTop;
   return (
     <div className={classes.container} style={style}>
-      <div>
+      <div style={textStyle}>
         <label>{props.number}</label>
       </div>
     </div>

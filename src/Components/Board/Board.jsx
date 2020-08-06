@@ -1,12 +1,8 @@
 import React, { Component } from "react";
 import classes from "./Board.module.css";
-import Number from "../../Components/Number/Number";
+import Number from "../Number/Number";
 import colors from "../../Utili/numberColor";
 export default class Board extends Component {
-  constructor() {
-    super();
-  }
-
   state = {
     board: [
       [2, 2, "", ""],
@@ -71,6 +67,7 @@ export default class Board extends Component {
     window.addEventListener("keypress", (e) => {
       this.onKeyDownHandler(e);
     });
+    this.initBoard();
   }
   componentWillUnmount() {
     window.removeEventListener("keypress", (e) => {});
@@ -87,6 +84,7 @@ export default class Board extends Component {
                   backgroundColor={colors[number].backgroundColor}
                   color={colors[number].color}
                   fontSize={colors[number].fontSize}
+                  paddingTop={colors[number].paddingTop}
                 ></Number>
               </div>
             ))}
@@ -161,6 +159,7 @@ export default class Board extends Component {
     this.setState({ board });
     this.addNumberBoBoard(this.state.board);
   }
+
   moveRowRight = (row, dir) => {
     for (let loop in row) {
       for (let i = row.length; i > 0; i--) {

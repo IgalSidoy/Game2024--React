@@ -1,12 +1,12 @@
 import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import Board from "./Containers/Board/Board";
+import Game from "./Containers/Game/Game";
 
 function App() {
   return (
     <div className="App">
-      <Board></Board>
+      <Game></Game>
     </div>
   );
 }
