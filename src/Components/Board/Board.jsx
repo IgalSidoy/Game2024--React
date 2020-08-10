@@ -60,6 +60,7 @@ export default class Board extends Component {
         }
       }
     }
+
     return gameover;
   }
 
@@ -93,30 +94,29 @@ export default class Board extends Component {
       </div>
     );
   }
-  onKeyDownHandler(e) {
+  onKeyDownHandler = async (e) => {
     let key = e.key.toLowerCase();
     //left
     if (key === "a") {
-      this.moveBoardHandler("left");
+      await this.moveBoardHandler("left");
       return;
     }
     //right
     if (key === "d") {
-      this.moveBoardHandler("right");
-      return;
+      await this.moveBoardHandler("right");
       return;
     }
     //up
     if (key === "w") {
-      this.moveBoardHandler("up");
+      await this.moveBoardHandler("up");
       return;
     }
     //down
     if (key === "s") {
-      this.moveBoardHandler("down");
+      await this.moveBoardHandler("down");
       return;
     }
-  }
+  };
   printBoard(board) {
     for (let line in board) {
       let line_str = "";
@@ -131,60 +131,83 @@ export default class Board extends Component {
       console.log(line_str);
     }
   }
-  moveBoardHandler(dir) {
-    console.clear();
+  moveBoardHandler = async (dir) => {
+    //console.clear();
     let board = JSON.parse(JSON.stringify(this.state.board));
 
     if (dir === "right") {
       for (let row_index in board) {
-        board[row_index] = this.moveRowRight(board[row_index], dir);
+        board[row_index] = await this.moveRowRight(board[row_index], dir);
       }
     }
     if (dir === "left") {
       for (let row_index in board) {
-        board[row_index] = this.moveRowLeft(board[row_index], dir);
+        board[row_index] = await this.moveRowLeft(board[row_index], dir);
       }
     }
     if (dir === "up") {
       for (let col_1 in board) {
-        board = this.moveUp(board, col_1);
+        board = await this.moveUp(board, col_1);
       }
     }
     if (dir === "down") {
       for (let col_1 in board) {
-        board = this.moveDown(board, col_1);
+        board = await this.moveDown(board, col_1);
       }
     }
 
+    this.props.updateScoreHandler(this.calcScore(board));
     this.setState({ board });
-    this.addNumberBoBoard(this.state.board);
-  }
 
-  moveRowRight = (row, dir) => {
+    this.addNumberBoBoard(this.state.board);
+  };
+
+  calcScore = (board) => {
+    let score = 0;
+    let max = 4;
+    for (let row in board) {
+      for (let col in board[row]) {
+        let number = board[row][col];
+        if (number === 2) continue;
+
+        //(n−1) 2ⁿ
+      }
+    }
+    score = (max - 1) * Math.pow(2, max);
+    return score;
+  };
+  moveRowRight = async (row, dir) => {
+    let is_added = false;
     for (let loop in row) {
       for (let i = row.length; i > 0; i--) {
-        row = this.checkTwoNumber(row, dir, i - 1, i);
+        let res = this.checkTwoNumber(row, dir, i - 1, i, is_added);
+        row = res.row;
+        is_added = res.is_added;
       }
     }
     return row;
   };
-  moveRowLeft = (row, dir) => {
+  moveRowLeft = async (row, dir) => {
+    let is_added = false;
     for (let loop in row) {
       for (let i = 0; i < row.length - 1; i++) {
-        row = this.checkTwoNumber(row, dir, i, i + 1);
+        let res = this.checkTwoNumber(row, dir, i, i + 1, is_added);
+
+        row = res.row;
+        is_added = res.is_added;
       }
     }
     return row;
   };
-  moveUp = (board, col_i) => {
+  moveUp = async (board, col_i) => {
     let row = this.colToRow(board, col_i);
-    row = this.moveRowLeft(row, "left");
+    row = await this.moveRowLeft(row, "left");
     board = this.rowToCol(board, col_i, row);
     return board;
   };
-  moveDown = (board, col_i) => {
+  moveDown = async (board, col_i) => {
     let row = this.colToRow(board, col_i);
-    row = this.moveRowLeft(row, "right");
+    row = await this.moveRowLeft(row, "right");
     board = this.rowToCol(board, col_i, row);
     return board;
   };
@@ -201,14 +224,21 @@ export default class Board extends Component {
     }
     return board;
   };
-  checkTwoNumber = (row, dir, left_i, right_i) => {
+  checkTwoNumber = (row, dir, left_i, right_i, is_added) => {
     let right_num = row[right_i];
     let left_num = row[left_i];
+    let result = {};
     //console.log("row", row, "left", left_num, "right", right_num);
     if (dir === "right") {
       if (right_num === left_num) {
+        if (is_added) {
+          result.row = row;
+          result.is_added = is_added;
+          return result;
+        }
         row[right_i] = right_num * 2;
         row[left_i] = "";
+        is_added = true;
       }
       if (right_num === "") {
         row[right_i] = left_num;
@@ -217,14 +247,23 @@ export default class Board extends Component {
     }
     if (dir === "left") {
       if (right_num === left_num) {
+        if (is_added) {
+          result.row = row;
+          result.is_added = is_added;
+          return result;
+        }
         row[left_i] = left_num * 2;
         row[right_i] = "";
+        is_added = true;
       }
       if (left_num === "") {
         row[left_i] = right_num;
         row[right_i] = "";
       }
     }
-    return row;
+
+    result.row = row;
+    result.is_added = is_added;
+    return result;
   };
 }
