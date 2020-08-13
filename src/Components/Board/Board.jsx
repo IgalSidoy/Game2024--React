@@ -5,10 +5,10 @@ import colors from "../../Utili/numberColor";
 export default class Board extends Component {
   state = {
     board: [
-      [2, 2, "", ""],
-      ["", "", "", ""],
-      ["", "", "", ""],
-      ["", "", "", 16],
+      [64, 8, 4, ""],
+      [32, 4, 2, 4],
+      [16, 8, 16, 2],
+      [8, 4, 2, 16],
     ],
     number: 2,
   };
@@ -18,7 +18,7 @@ export default class Board extends Component {
       ["", "", "", ""],
       ["", "", "", ""],
       ["", "", "", ""],
-      ["", "", 2, 2],
+      ["", "", 4, 2],
     ];
 
     this.setState({ board });
@@ -28,11 +28,7 @@ export default class Board extends Component {
     board[row_i][col_i] = number;
     return board;
   }
-  addNumberBoBoard(board) {
-    if (this.gameOver(board)) {
-      alert("game over");
-      return;
-    }
+  addNumberBoBoard = async (board) => {
     let empty = [];
     for (let row_i in board) {
       for (let col_i in board[row_i]) {
@@ -41,6 +37,12 @@ export default class Board extends Component {
         }
       }
     }
+    if (empty.length === 0) {
+      alert("game over");
+      this.initBoard();
+      return;
+    }
+
     let selected = Math.round(Math.random() * empty.length - 1);
     if (selected < 0) selected = 0;
     let row_i = empty[selected].split("-")[0];
@@ -49,20 +51,7 @@ export default class Board extends Component {
     this.setState({
       board,
     });
-  }
-
-  gameOver(board) {
-    let gameover = true;
-    for (let row_i in board) {
-      for (let col_i in board[row_i]) {
-        if (board[row_i][col_i] !== "") {
-          gameover = false;
-        }
-      }
-    }
-
-    return gameover;
-  }
+  };
 
   componentDidMount() {
     window.addEventListener("keypress", (e) => {
@@ -99,22 +88,18 @@ export default class Board extends Component {
     //left
     if (key === "a") {
       await this.moveBoardHandler("left");
-      return;
     }
     //right
-    if (key === "d") {
+    else if (key === "d") {
       await this.moveBoardHandler("right");
-      return;
     }
     //up
-    if (key === "w") {
+    else if (key === "w") {
       await this.moveBoardHandler("up");
-      return;
     }
     //down
-    if (key === "s") {
+    else if (key === "s") {
       await this.moveBoardHandler("down");
-      return;
     }
   };
   printBoard(board) {
@@ -132,7 +117,6 @@ export default class Board extends Component {
     }
   }
   moveBoardHandler = async (dir) => {
-    //console.clear();
     let board = JSON.parse(JSON.stringify(this.state.board));
 
     if (dir === "right") {
